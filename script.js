@@ -13,6 +13,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const expElement = document.getElementById('exp');
     const progressElement = document.getElementById('progress');
     const upgradeButton = document.getElementById('upgrade-coin');
+    const notificationsElement = document.getElementById('notifications');
+
+    // Function to show notifications
+    const showNotification = (message) => {
+        const notification = document.createElement('div');
+        notification.className = 'notification';
+        notification.textContent = message;
+        notificationsElement.appendChild(notification);
+
+        // Remove the notification after the animation ends
+        setTimeout(() => {
+            notification.remove();
+        }, 3000); // Match the fadeOut animation duration
+    };
 
     // Update UI
     const updateUI = () => {
@@ -40,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (exp >= coinsPerLevel * level) {
             level++;
             exp = 0;
-            alert(`Level Up! You are now Level ${level}`);
+            showNotification(`Level Up! You are now Level ${level}`);
         }
 
         updateUI();
@@ -54,9 +68,9 @@ document.addEventListener('DOMContentLoaded', () => {
             coinValue *= 2; // Double the coin value
             updateUI();
             saveState();
-            alert(`Coin value upgraded to ${coinValue} exp per click!`);
+            showNotification(`Coin value upgraded to ${coinValue} exp per click!`);
         } else {
-            alert("Not enough coins to upgrade!");
+            showNotification("Not enough coins to upgrade!");
         }
     });
 
