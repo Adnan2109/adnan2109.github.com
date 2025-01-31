@@ -25,7 +25,9 @@ document.addEventListener('DOMContentLoaded', () => {
         coinValueElement.textContent = coinValue.toFixed(1);
         upgradeCostElement.textContent = upgradeCost;
 
-        const progress = (exp / (coinsPerLevel * level)) * 100;
+        // Update progress bar
+        const requiredExp = coinsPerLevel * level;
+        const progress = (exp / requiredExp) * 100;
         progressElement.style.width = `${progress}%`;
     };
 
@@ -44,9 +46,10 @@ document.addEventListener('DOMContentLoaded', () => {
         coins += 1;
 
         // Check for level up
-        if (exp >= coinsPerLevel * level) {
+        const requiredExp = coinsPerLevel * level;
+        if (exp >= requiredExp) {
             level++;
-            exp = 0;
+            exp = 0; // Reset exp after leveling up
         }
 
         updateUI();
