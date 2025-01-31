@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let level = parseInt(localStorage.getItem('level')) || 1;
     let exp = parseFloat(localStorage.getItem('exp')) || 0;
     let coinValue = parseFloat(localStorage.getItem('coinValue')) || 0.5;
+    let upgradeCost = parseInt(localStorage.getItem('upgradeCost')) || 10;
 
     const coinsPerLevel = 10; // Coins needed to level up
 
@@ -11,28 +12,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const coinsElement = document.getElementById('coins');
     const levelElement = document.getElementById('level');
     const expElement = document.getElementById('exp');
+    const coinValueElement = document.getElementById('coin-value');
     const progressElement = document.getElementById('progress');
     const upgradeButton = document.getElementById('upgrade-coin');
-    const notificationsElement = document.getElementById('notifications');
-
-    // Function to show notifications
-    const showNotification = (message) => {
-        const notification = document.createElement('div');
-        notification.className = 'notification';
-        notification.textContent = message;
-        notificationsElement.appendChild(notification);
-
-        // Remove the notification after the animation ends
-        setTimeout(() => {
-            notification.remove();
-        }, 3000); // Match the fadeOut animation duration
-    };
+    const upgradeCostElement = document.getElementById('upgrade-cost');
 
     // Update UI
     const updateUI = () => {
         coinsElement.textContent = coins;
         levelElement.textContent = level;
         expElement.textContent = exp.toFixed(1);
+        coinValueElement.textContent = coinValue.toFixed(1);
+        upgradeCostElement.textContent = upgradeCost;
+
         const progress = (exp / (coinsPerLevel * level)) * 100;
         progressElement.style.width = `${progress}%`;
     };
@@ -43,6 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('level', level);
         localStorage.setItem('exp', exp);
         localStorage.setItem('coinValue', coinValue);
+        localStorage.setItem('upgradeCost', upgradeCost);
     };
 
     // Coin click event
@@ -54,7 +47,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (exp >= coinsPerLevel * level) {
             level++;
             exp = 0;
-            showNotification(`Level Up! You are now Level ${level}`);
         }
 
         updateUI();
@@ -63,14 +55,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Upgrade coin value
     upgradeButton.addEventListener('click', () => {
-        if (coins >= 10) {
-            coins -= 10;
+        if (coins >= upgradeCost) {
+            coins -= upgradeCost;
             coinValue *= 2; // Double the coin value
+            upgradeCost *= 2; // Double the upgrade cost
             updateUI();
             saveState();
-            showNotification(`Coin value upgraded to ${coinValue} exp per click!`);
-        } else {
-            showNotification("Not enough coins to upgrade!");
         }
     });
 
