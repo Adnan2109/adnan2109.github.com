@@ -1,68 +1,79 @@
 /* General Styles */
 body {
     font-family: 'Arial', sans-serif;
+    margin: 0;
+    overflow: hidden;
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    color: white;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
-    margin: 0;
-    background: linear-gradient(135deg, #6a11cb, #2575fc);
-    color: white;
 }
 
 .game-container {
-    text-align: center;
+    position: relative;
+    width: 300px;
+    height: 600px;
     background: rgba(255, 255, 255, 0.1);
-    padding: 20px;
     border-radius: 15px;
     backdrop-filter: blur(10px);
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
-}
-
-.stats p {
-    margin: 10px 0;
-    font-size: 1.2em;
-}
-
-.progress-bar {
-    width: 100%;
-    height: 20px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 10px;
-    margin: 20px 0;
     overflow: hidden;
 }
 
-#progress {
-    height: 100%;
-    width: 0%;
-    background: linear-gradient(90deg, #ff7e5f, #feb47b);
+.score {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-size: 1.2em;
+    z-index: 10;
+}
+
+.car {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50px;
+    height: 100px;
+    background: url('car.png') no-repeat center center/cover;
+    z-index: 5;
+}
+
+.obstacle, .coin {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    background: red;
     border-radius: 10px;
-    transition: width 0.3s ease;
+    z-index: 2;
 }
 
 .coin {
-    font-size: 100px;
-    cursor: pointer;
-    user-select: none;
-    animation: spin 0.5s ease-in-out;
-    transition: transform 0.1s ease;
+    background: url('coin.png') no-repeat center center/cover;
+    background-color: transparent;
 }
 
-.coin:active {
-    transform: scale(0.95);
+.game-over {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 20px;
+    border-radius: 10px;
+    display: none;
+    z-index: 20;
 }
 
-@keyframes spin {
-    0% { transform: rotateY(0deg); }
-    100% { transform: rotateY(360deg); }
+.game-over h1 {
+    margin: 0;
+    font-size: 2em;
 }
 
-.shop {
-    margin-top: 20px;
-}
-
-.shop button {
+.game-over button {
     padding: 10px 20px;
     font-size: 1em;
     background: #4caf50;
@@ -73,6 +84,6 @@ body {
     transition: background 0.3s ease;
 }
 
-.shop button:hover {
+.game-over button:hover {
     background: #45a049;
 }
