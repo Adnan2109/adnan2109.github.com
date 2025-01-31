@@ -3,25 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modern Coin Clicker</title>
+    <title>Modern Car Game</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="game-container">
-        <h1>Modern Coin Clicker</h1>
-        <div class="stats">
-            <p>Level: <span id="level">1</span></p>
-            <p>Coins: <span id="coins">0</span></p>
-            <p>Exp: <span id="exp">0</span></p>
-            <p>Coin Value: <span id="coin-value">0.5</span> exp</p>
-        </div>
-        <div class="progress-bar">
-            <div id="progress"></div>
-        </div>
-        <div id="coin" class="coin">💰</div>
-        <div class="shop">
-            <h2>Shop</h2>
-            <button id="upgrade-coin">Upgrade Coin (Cost: <span id="upgrade-cost">10</span> Coins)</button>
+        <div class="score">Score: <span id="score">0</span></div>
+        <div id="car" class="car"></div>
+        <div id="game-over" class="game-over">
+            <h1>Game Over!</h1>
+            <p>Your Score: <span id="final-score">0</span></p>
+            <button id="restart">Restart</button>
         </div>
     </div>
     <script src="script.js"></script>
