@@ -16,16 +16,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const factoryCostElement = document.getElementById('factory-cost');
     const bakeryElement = document.getElementById('bakery');
     const factoryElement = document.getElementById('factory');
+    const backgroundMusic = document.getElementById('background-music');
+    const clickSound = document.getElementById('click-sound');
+
+    // Play background music
+    backgroundMusic.volume = 0.5;
+    backgroundMusic.play();
 
     // Update UI
     const updateUI = () => {
-        moneyElement.textContent = money.toFixed(2);
-        lemonadeIncomeElement.textContent = businesses.lemonade.income.toFixed(2);
-        lemonadeCostElement.textContent = businesses.lemonade.cost.toFixed(2);
-        bakeryIncomeElement.textContent = businesses.bakery.income.toFixed(2);
-        bakeryCostElement.textContent = businesses.bakery.cost.toFixed(2);
-        factoryIncomeElement.textContent = businesses.factory.income.toFixed(2);
-        factoryCostElement.textContent = businesses.factory.cost.toFixed(2);
+        moneyElement.textContent = `$${money.toFixed(2)}`;
+        lemonadeIncomeElement.textContent = `$${businesses.lemonade.income.toFixed(2)}`;
+        lemonadeCostElement.textContent = `$${businesses.lemonade.cost.toFixed(2)}`;
+        bakeryIncomeElement.textContent = `$${businesses.bakery.income.toFixed(2)}`;
+        bakeryCostElement.textContent = `$${businesses.bakery.cost.toFixed(2)}`;
+        factoryIncomeElement.textContent = `$${businesses.factory.income.toFixed(2)}`;
+        factoryCostElement.textContent = `$${businesses.factory.cost.toFixed(2)}`;
 
         // Unlock businesses
         if (money >= 50 && businesses.bakery.level === 0) {
@@ -50,6 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
             biz.level++;
             biz.income *= 1.5; // Increase income by 50%
             biz.cost *= 2; // Double the cost for the next upgrade
+            clickSound.play();
             updateUI();
             saveState();
         }
