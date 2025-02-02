@@ -45,17 +45,20 @@
         road.position.y = -1;
         scene.add(road);
 
-        // Load Car Model (replace the cube with a GLTF model)
+        // Load Car Model (using a different URL for the model)
         const loader = new THREE.GLTFLoader();
         let car;
 
-        loader.load('https://cdn.jsdelivr.net/gh/mrdoob/three.js/examples/models/gltf/Car.glb', function(gltf) {
+        loader.load('https://cdn.jsdelivr.net/gh/ceruleansilver/ThreeJS-Examples/models/gltf/LowPolyCar/LowPolyCar.glb', function(gltf) {
             car = gltf.scene;
             car.scale.set(0.5, 0.5, 0.5); // Scale the car model to fit
             car.position.y = 1;
             scene.add(car);
-        }, undefined, function(error) {
-            console.error(error);
+            console.log("Car loaded successfully!");
+        }, function(xhr) {
+            console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+        }, function(error) {
+            console.error('An error happened while loading the car model:', error);
         });
 
         // Camera setup
@@ -100,7 +103,6 @@
         }
 
         animate();
-
     </script>
 </body>
 </html>
