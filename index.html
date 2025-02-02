@@ -5,31 +5,58 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Business Tycoon</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <div class="game-container">
         <h1>Business Tycoon</h1>
         <div class="stats">
-            <p>Money: $<span id="money">0</span></p>
+            <p>Money: <span id="money">$0.00</span></p>
         </div>
         <div class="businesses">
             <div class="business" id="lemonade-stand">
+                <div class="icon"><i class="fas fa-lemon"></i></div>
                 <h2>Lemonade Stand</h2>
-                <p>Income: $<span id="lemonade-income">1</span>/sec</p>
-                <button onclick="upgradeBusiness('lemonade')">Upgrade ($<span id="lemonade-cost">10</span>)</button>
+                <p>Income: <span id="lemonade-income">$1.00</span>/sec</p>
+                <div class="progress-bar">
+                    <div class="progress" id="lemonade-progress"></div>
+                </div>
+                <button onclick="upgradeBusiness('lemonade')">
+                    <i class="fas fa-arrow-up"></i> Upgrade (<span id="lemonade-cost">$10.00</span>)
+                </button>
             </div>
             <div class="business" id="bakery" style="display: none;">
+                <div class="icon"><i class="fas fa-bread-slice"></i></div>
                 <h2>Bakery</h2>
-                <p>Income: $<span id="bakery-income">5</span>/sec</p>
-                <button onclick="upgradeBusiness('bakery')">Upgrade ($<span id="bakery-cost">50</span>)</button>
+                <p>Income: <span id="bakery-income">$5.00</span>/sec</p>
+                <div class="progress-bar">
+                    <div class="progress" id="bakery-progress"></div>
+                </div>
+                <button onclick="upgradeBusiness('bakery')">
+                    <i class="fas fa-arrow-up"></i> Upgrade (<span id="bakery-cost">$50.00</span>)
+                </button>
             </div>
             <div class="business" id="factory" style="display: none;">
+                <div class="icon"><i class="fas fa-industry"></i></div>
                 <h2>Factory</h2>
-                <p>Income: $<span id="factory-income">20</span>/sec</p>
-                <button onclick="upgradeBusiness('factory')">Upgrade ($<span id="factory-cost">200</span>)</button>
+                <p>Income: <span id="factory-income">$20.00</span>/sec</p>
+                <div class="progress-bar">
+                    <div class="progress" id="factory-progress"></div>
+                </div>
+                <button onclick="upgradeBusiness('factory')">
+                    <i class="fas fa-arrow-up"></i> Upgrade (<span id="factory-cost">$200.00</span>)
+                </button>
             </div>
         </div>
     </div>
+    <audio id="background-music" loop>
+        <source src="background-music.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+    <audio id="click-sound">
+        <source src="click-sound.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
     <script src="script.js"></script>
 </body>
 </html>
