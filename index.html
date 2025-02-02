@@ -19,16 +19,34 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
 
-        // Create a simple track
-        const geometry = new THREE.PlaneGeometry(200, 200);
-        const material = new THREE.MeshBasicMaterial({ color: 0x00ff00, side: THREE.DoubleSide });
-        const plane = new THREE.Mesh(geometry, material);
-        plane.rotation.x = - Math.PI / 2;
-        scene.add(plane);
+        // Lighting
+        const light = new THREE.PointLight(0xffffff, 1, 100);
+        light.position.set(0, 50, 50);
+        scene.add(light);
 
-        // Create a simple car model (cube for now)
+        // Skybox (simple background)
+        const textureLoader = new THREE.CubeTextureLoader();
+        const skyboxTexture = textureLoader.load([
+            'https://cdn.pixabay.com/photo/2017/08/30/01/47/sky-2695565_960_720.jpg', // Front
+            'https://cdn.pixabay.com/photo/2017/08/30/01/47/sky-2695565_960_720.jpg', // Back
+            'https://cdn.pixabay.com/photo/2017/08/30/01/47/sky-2695565_960_720.jpg', // Right
+            'https://cdn.pixabay.com/photo/2017/08/30/01/47/sky-2695565_960_720.jpg', // Left
+            'https://cdn.pixabay.com/photo/2017/08/30/01/47/sky-2695565_960_720.jpg', // Top
+            'https://cdn.pixabay.com/photo/2017/08/30/01/47/sky-2695565_960_720.jpg'  // Bottom
+        ]);
+        scene.background = skyboxTexture;
+
+        // Create a simple road (improve the track)
+        const roadGeometry = new THREE.PlaneGeometry(100, 200);
+        const roadMaterial = new THREE.MeshLambertMaterial({ color: 0x2c3e50 });
+        const road = new THREE.Mesh(roadGeometry, roadMaterial);
+        road.rotation.x = - Math.PI / 2;
+        road.position.y = -1;
+        scene.add(road);
+
+        // Create a simple car model (still a cube for now)
         const carGeometry = new THREE.BoxGeometry(5, 2, 2);
-        const carMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+        const carMaterial = new THREE.MeshLambertMaterial({ color: 0xff0000 });
         const car = new THREE.Mesh(carGeometry, carMaterial);
         car.position.y = 1;
         scene.add(car);
@@ -40,39 +58,27 @@
 
         // Car movement variables
         let speed = 0;
-        let rotationSpeed = 0;
-        let isAccelerating = false;
-        let isBraking = false;
-        let isTurningLeft = false;
-        let isTurningRight = false;
+        let acceleration = 0.1;
+        let friction = 0.98;
+        let maxSpeed = 5;
+        let turnSpeed = 0.05;
 
         // Keyboard input
         document.addEventListener('keydown', (event) => {
-            if (event.key === 'w') isAccelerating = true;
-            if (event.key === 's') isBraking = true;
-            if (event.key === 'a') isTurningLeft = true;
-            if (event.key === 'd') isTurningRight = true;
-        });
-
-        document.addEventListener('keyup', (event) => {
-            if (event.key === 'w') isAccelerating = false;
-            if (event.key === 's') isBraking = false;
-            if (event.key === 'a') isTurningLeft = false;
-            if (event.key === 'd') isTurningRight = false;
+            if (event.key === 'w') speed = Math.min(speed + acceleration, maxSpeed);
+            if (event.key === 's') speed = Math.max(speed - acceleration, -maxSpeed);
+            if (event.key === 'a') car.rotation.y += turnSpeed;
+            if (event.key === 'd') car.rotation.y -= turnSpeed;
         });
 
         // Game loop
         function animate() {
             requestAnimationFrame(animate);
 
-            // Car physics (simple version)
-            if (isAccelerating) speed += 0.1;
-            if (isBraking) speed -= 0.1;
-            if (!isAccelerating && !isBraking) speed *= 0.98; // Friction
+            // Apply friction
+            speed *= friction;
 
-            if (isTurningLeft) car.rotation.y += 0.05;
-            if (isTurningRight) car.rotation.y -= 0.05;
-
+            // Move the car based on speed and direction
             car.position.x += Math.sin(car.rotation.y) * speed;
             car.position.z += Math.cos(car.rotation.y) * speed;
 
