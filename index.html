@@ -16,7 +16,7 @@
         // Scene Setup
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer();
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
 
@@ -26,26 +26,22 @@
         scene.add(light);
 
         // Skybox (simple background)
-        const textureLoader = new THREE.CubeTextureLoader();
-        const skyboxTexture = textureLoader.load([
-            'https://cdn.pixabay.com/photo/2017/08/30/01/47/sky-2695565_960_720.jpg', // Front
-            'https://cdn.pixabay.com/photo/2017/08/30/01/47/sky-2695565_960_720.jpg', // Back
-            'https://cdn.pixabay.com/photo/2017/08/30/01/47/sky-2695565_960_720.jpg', // Right
-            'https://cdn.pixabay.com/photo/2017/08/30/01/47/sky-2695565_960_720.jpg', // Left
-            'https://cdn.pixabay.com/photo/2017/08/30/01/47/sky-2695565_960_720.jpg', // Top
-            'https://cdn.pixabay.com/photo/2017/08/30/01/47/sky-2695565_960_720.jpg'  // Bottom
-        ]);
-        scene.background = skyboxTexture;
+        scene.background = new THREE.Color(0x87CEEB); // Light blue sky
 
-        // Create a simple road (improve the track)
+        // Road with texture
+        const roadTexture = new THREE.TextureLoader().load('https://i.imgur.com/6QZQZQZ.jpg'); // Replace with your road texture
+        roadTexture.wrapS = THREE.RepeatWrapping;
+        roadTexture.wrapT = THREE.RepeatWrapping;
+        roadTexture.repeat.set(10, 20); // Adjust based on road size
+
         const roadGeometry = new THREE.PlaneGeometry(100, 200);
-        const roadMaterial = new THREE.MeshLambertMaterial({ color: 0x2c3e50 });
+        const roadMaterial = new THREE.MeshLambertMaterial({ map: roadTexture });
         const road = new THREE.Mesh(roadGeometry, roadMaterial);
         road.rotation.x = - Math.PI / 2;
         road.position.y = -1;
         scene.add(road);
 
-        // Load Car Model (using a different URL for the model)
+        // Load Car Model
         const loader = new THREE.GLTFLoader();
         let car;
 
@@ -55,10 +51,8 @@
             car.position.y = 1;
             scene.add(car);
             console.log("Car loaded successfully!");
-        }, function(xhr) {
-            console.log((xhr.loaded / xhr.total * 100) + '% loaded');
-        }, function(error) {
-            console.error('An error happened while loading the car model:', error);
+        }, undefined, function(error) {
+            console.error('Failed to load car model:', error);
         });
 
         // Camera setup
@@ -67,24 +61,45 @@
 
         // Car movement variables
         let speed = 0;
-        let acceleration = 0.1;
-        let friction = 0.98;
-        let maxSpeed = 5;
-        let turnSpeed = 0.05;
+        const acceleration = 0.1;
+        const friction = 0.98;
+        const maxSpeed = 5;
+        const turnSpeed = 0.05;
 
         // Keyboard input
+        const keys = { w: false, s: false, a: false, d: false };
+
         document.addEventListener('keydown', (event) => {
-            if (event.key === 'w') speed = Math.min(speed + acceleration, maxSpeed);
-            if (event.key === 's') speed = Math.max(speed - acceleration, -maxSpeed);
-            if (event.key === 'a') car.rotation.y += turnSpeed;
-            if (event.key === 'd') car.rotation.y -= turnSpeed;
+            if (event.key === 'w') keys.w = true;
+            if (event.key === 's') keys.s = true;
+            if (event.key === 'a') keys.a = true;
+            if (event.key === 'd') keys.d = true;
         });
+
+        document.addEventListener('keyup', (event) => {
+            if (event.key === 'w') keys.w = false;
+            if (event.key === 's') keys.s = false;
+            if (event.key === 'a') keys.a = false;
+            if (event.key === 'd') keys.d = false;
+        });
+
+        // Smooth camera movement
+        const cameraOffset = new THREE.Vector3(10, 5, 10); // Camera offset from the car
+        const cameraSmoothing = 0.1; // Smoothing factor
 
         // Game loop
         function animate() {
             requestAnimationFrame(animate);
 
             if (car) {
+                // Handle acceleration and braking
+                if (keys.w) speed = Math.min(speed + acceleration, maxSpeed);
+                if (keys.s) speed = Math.max(speed - acceleration, -maxSpeed);
+
+                // Handle turning
+                if (keys.a) car.rotation.y += turnSpeed;
+                if (keys.d) car.rotation.y -= turnSpeed;
+
                 // Apply friction
                 speed *= friction;
 
@@ -92,10 +107,13 @@
                 car.position.x += Math.sin(car.rotation.y) * speed;
                 car.position.z += Math.cos(car.rotation.y) * speed;
 
-                // Update camera position
-                camera.position.x = car.position.x + 10 * Math.sin(car.rotation.y);
-                camera.position.z = car.position.z + 10 * Math.cos(car.rotation.y);
-                camera.position.y = car.position.y + 5;
+                // Smooth camera movement
+                const targetCameraPosition = new THREE.Vector3(
+                    car.position.x + cameraOffset.x * Math.sin(car.rotation.y),
+                    car.position.y + cameraOffset.y,
+                    car.position.z + cameraOffset.z * Math.cos(car.rotation.y)
+                );
+                camera.position.lerp(targetCameraPosition, cameraSmoothing);
                 camera.lookAt(car.position);
             }
 
@@ -103,6 +121,13 @@
         }
 
         animate();
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
     </script>
 </body>
 </html>
