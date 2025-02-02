@@ -11,6 +11,7 @@
 </head>
 <body>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three/examples/js/loaders/GLTFLoader.js"></script>
     <script>
         // Scene Setup
         const scene = new THREE.Scene();
@@ -44,17 +45,22 @@
         road.position.y = -1;
         scene.add(road);
 
-        // Create a simple car model (still a cube for now)
-        const carGeometry = new THREE.BoxGeometry(5, 2, 2);
-        const carMaterial = new THREE.MeshLambertMaterial({ color: 0xff0000 });
-        const car = new THREE.Mesh(carGeometry, carMaterial);
-        car.position.y = 1;
-        scene.add(car);
+        // Load Car Model (replace the cube with a GLTF model)
+        const loader = new THREE.GLTFLoader();
+        let car;
+
+        loader.load('https://cdn.jsdelivr.net/gh/mrdoob/three.js/examples/models/gltf/Car.glb', function(gltf) {
+            car = gltf.scene;
+            car.scale.set(0.5, 0.5, 0.5); // Scale the car model to fit
+            car.position.y = 1;
+            scene.add(car);
+        }, undefined, function(error) {
+            console.error(error);
+        });
 
         // Camera setup
         camera.position.z = 20;
         camera.position.y = 5;
-        camera.lookAt(car.position);
 
         // Car movement variables
         let speed = 0;
@@ -75,18 +81,20 @@
         function animate() {
             requestAnimationFrame(animate);
 
-            // Apply friction
-            speed *= friction;
+            if (car) {
+                // Apply friction
+                speed *= friction;
 
-            // Move the car based on speed and direction
-            car.position.x += Math.sin(car.rotation.y) * speed;
-            car.position.z += Math.cos(car.rotation.y) * speed;
+                // Move the car based on speed and direction
+                car.position.x += Math.sin(car.rotation.y) * speed;
+                car.position.z += Math.cos(car.rotation.y) * speed;
 
-            // Update camera position
-            camera.position.x = car.position.x + 10 * Math.sin(car.rotation.y);
-            camera.position.z = car.position.z + 10 * Math.cos(car.rotation.y);
-            camera.position.y = car.position.y + 5;
-            camera.lookAt(car.position);
+                // Update camera position
+                camera.position.x = car.position.x + 10 * Math.sin(car.rotation.y);
+                camera.position.z = car.position.z + 10 * Math.cos(car.rotation.y);
+                camera.position.y = car.position.y + 5;
+                camera.lookAt(car.position);
+            }
 
             renderer.render(scene, camera);
         }
