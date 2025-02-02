@@ -3,17 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modern Car Game</title>
+    <title>Business Tycoon</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="game-container">
-        <div class="score">Score: <span id="score">0</span></div>
-        <div id="car" class="car"></div>
-        <div id="game-over" class="game-over">
-            <h1>Game Over!</h1>
-            <p>Your Score: <span id="final-score">0</span></p>
-            <button id="restart">Restart</button>
+        <h1>Business Tycoon</h1>
+        <div class="stats">
+            <p>Money: $<span id="money">0</span></p>
+        </div>
+        <div class="businesses">
+            <div class="business" id="lemonade-stand">
+                <h2>Lemonade Stand</h2>
+                <p>Income: $<span id="lemonade-income">1</span>/sec</p>
+                <button onclick="upgradeBusiness('lemonade')">Upgrade ($<span id="lemonade-cost">10</span>)</button>
+            </div>
+            <div class="business" id="bakery" style="display: none;">
+                <h2>Bakery</h2>
+                <p>Income: $<span id="bakery-income">5</span>/sec</p>
+                <button onclick="upgradeBusiness('bakery')">Upgrade ($<span id="bakery-cost">50</span>)</button>
+            </div>
+            <div class="business" id="factory" style="display: none;">
+                <h2>Factory</h2>
+                <p>Income: $<span id="factory-income">20</span>/sec</p>
+                <button onclick="upgradeBusiness('factory')">Upgrade ($<span id="factory-cost">200</span>)</button>
+            </div>
         </div>
     </div>
     <script src="script.js"></script>
