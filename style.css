@@ -2,8 +2,7 @@
 body {
     font-family: 'Arial', sans-serif;
     margin: 0;
-    overflow: hidden;
-    background: #333;
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
     color: white;
     display: flex;
     justify-content: center;
@@ -12,73 +11,44 @@ body {
 }
 
 .game-container {
-    position: relative;
-    width: 300px;
-    height: 600px;
-    background: url('highway.jpg') repeat-y;
-    background-size: 100% auto;
-    border-radius: 15px;
-    overflow: hidden;
-    animation: moveBackground 5s linear infinite;
-}
-
-@keyframes moveBackground {
-    from { background-position: 0 0; }
-    to { background-position: 0 100%; }
-}
-
-.score {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    font-size: 1.2em;
-    z-index: 10;
-}
-
-.car {
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 50px;
-    height: 100px;
-    background: url('car.png') no-repeat center center/cover;
-    z-index: 5;
-}
-
-.obstacle, .coin {
-    position: absolute;
-    width: 50px;
-    height: 100px;
-    background: url('other-car.png') no-repeat center center/cover;
-    z-index: 2;
-}
-
-.coin {
-    background: url('coin.png') no-repeat center center/cover;
-    background-color: transparent;
-    height: 50px;
-}
-
-.game-over {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
     text-align: center;
-    background: rgba(0, 0, 0, 0.8);
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+}
+
+.stats {
+    margin-bottom: 20px;
+}
+
+.stats p {
+    font-size: 1.5em;
+}
+
+.businesses {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.business {
+    background: rgba(255, 255, 255, 0.1);
     padding: 20px;
     border-radius: 10px;
-    display: none;
-    z-index: 20;
+    text-align: left;
 }
 
-.game-over h1 {
-    margin: 0;
-    font-size: 2em;
+.business h2 {
+    margin: 0 0 10px 0;
 }
 
-.game-over button {
+.business p {
+    margin: 5px 0;
+}
+
+.business button {
     padding: 10px 20px;
     font-size: 1em;
     background: #4caf50;
@@ -89,6 +59,11 @@ body {
     transition: background 0.3s ease;
 }
 
-.game-over button:hover {
+.business button:hover {
     background: #45a049;
+}
+
+.business button:disabled {
+    background: #777;
+    cursor: not-allowed;
 }
