@@ -24,3 +24,21 @@ body {
   position: absolute;
   cursor: pointer;
 }
+
+.modes {
+  margin-top: 20px;
+}
+
+.modes button {
+  padding: 10px 20px;
+  margin: 5px;
+  border: none;
+  border-radius: 5px;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+}
+
+.modes button:hover {
+  background-color: #0056b3;
+}
