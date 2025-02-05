@@ -1,1 +1,13 @@
+.score, .level {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-size: 1.2em;
+    z-index: 10;
+}
+
+.level {
+    left: auto;
+    right: 10px;
+}
 
