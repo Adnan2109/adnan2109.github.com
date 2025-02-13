@@ -16,7 +16,7 @@ let direction = { x: 0, y: 0 }; // Initial direction
 let score = 0;
 let gameOver = false;
 let lastUpdateTime = 0;
-const snakeSpeed = 10; // Pixels per second
+const snakeSpeed = 5; // Pixels per second
 
 // Particle class for effects
 class Particle {
