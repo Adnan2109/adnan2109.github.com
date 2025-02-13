@@ -1,86 +1,90 @@
-const ball = document.getElementById("ball");
-const scoreDisplay = document.getElementById("score");
-const timeLeftDisplay = document.getElementById("time-left");
-const highScoreDisplay = document.getElementById("high-score");
-const slowModeButton = document.getElementById("slow-mode");
-const normalModeButton = document.getElementById("normal-mode");
-const fastModeButton = document.getElementById("fast-mode");
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+const scoreDisplay = document.getElementById('score');
 
+const gridSize = 20; // Size of each grid square
+const tileCount = canvas.width / gridSize; // Number of tiles in each row/column
+
+let snake = [{ x: 10, y: 10 }]; // Initial snake position
+let food = { x: 5, y: 5 }; // Initial food position
+let direction = { x: 0, y: 0 }; // Initial direction
 let score = 0;
-let timeLeft = 10;
-let gameInterval;
-let moveInterval;
-let ballSpeed = 500; // Default speed (normal mode)
-let highScore = localStorage.getItem("highScore") || 0;
-highScoreDisplay.textContent = highScore;
 
-// Function to move the ball randomly
-function moveBall() {
-  const x = Math.random() * (window.innerWidth - 50);
-  const y = Math.random() * (window.innerHeight - 50);
-  ball.style.left = `${x}px`;
-  ball.style.top = `${y}px`;
-}
+// Draw the game
+function drawGame() {
+    // Clear the canvas
+    ctx.fillStyle = '#222';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-// Function to start the game
-function startGame() {
-  score = 0;
-  timeLeft = 10;
-  scoreDisplay.textContent = score;
-  timeLeftDisplay.textContent = timeLeft;
+    // Draw the snake
+    ctx.fillStyle = 'lime';
+    snake.forEach(segment => ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize, gridSize));
 
-  // Clear existing intervals
-  clearInterval(gameInterval);
-  clearInterval(moveInterval);
+    // Draw the food
+    ctx.fillStyle = 'red';
+    ctx.fillRect(food.x * gridSize, food.y * gridSize, gridSize, gridSize);
 
-  // Move the ball based on the selected speed
-  moveInterval = setInterval(moveBall, ballSpeed);
+    // Move the snake
+    const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
+    snake.unshift(head);
 
-  // Update the timer every second
-  gameInterval = setInterval(() => {
-    timeLeft--;
-    timeLeftDisplay.textContent = timeLeft;
-
-    if (timeLeft === 0) {
-      clearInterval(gameInterval);
-      clearInterval(moveInterval);
-      updateHighScore();
-      alert(`Game Over! Your score is ${score}`);
+    // Check for food collision
+    if (head.x === food.x && head.y === food.y) {
+        score++;
+        scoreDisplay.textContent = score;
+        placeFood();
+    } else {
+        snake.pop(); // Remove the tail if no food is eaten
     }
-  }, 1000);
+
+    // Check for collisions
+    if (
+        head.x < 0 || head.x >= tileCount ||
+        head.y < 0 || head.y >= tileCount ||
+        snake.slice(1).some(segment => segment.x === head.x && segment.y === head.y)
+    ) {
+        alert(`Game Over! Your score is ${score}`);
+        resetGame();
+    }
 }
 
-// Function to update the high score
-function updateHighScore() {
-  if (score > highScore) {
-    highScore = score;
-    localStorage.setItem("highScore", highScore);
-    highScoreDisplay.textContent = highScore;
-  }
+// Place food randomly
+function placeFood() {
+    food.x = Math.floor(Math.random() * tileCount);
+    food.y = Math.floor(Math.random() * tileCount);
+
+    // Ensure food doesn't spawn on the snake
+    if (snake.some(segment => segment.x === food.x && segment.y === food.y)) {
+        placeFood();
+    }
 }
 
-// Event listener for clicking the ball
-ball.addEventListener("click", () => {
-  score++;
-  scoreDisplay.textContent = score;
-  moveBall();
+// Reset the game
+function resetGame() {
+    snake = [{ x: 10, y: 10 }];
+    direction = { x: 0, y: 0 };
+    score = 0;
+    scoreDisplay.textContent = score;
+    placeFood();
+}
+
+// Handle keyboard input
+document.addEventListener('keydown', event => {
+    switch (event.key) {
+        case 'ArrowUp':
+            if (direction.y === 0) direction = { x: 0, y: -1 };
+            break;
+        case 'ArrowDown':
+            if (direction.y === 0) direction = { x: 0, y: 1 };
+            break;
+        case 'ArrowLeft':
+            if (direction.x === 0) direction = { x: -1, y: 0 };
+            break;
+        case 'ArrowRight':
+            if (direction.x === 0) direction = { x: 1, y: 0 };
+            break;
+    }
 });
 
-// Event listeners for game modes
-slowModeButton.addEventListener("click", () => {
-  ballSpeed = 1000; // Slow mode
-  startGame();
-});
-
-normalModeButton.addEventListener("click", () => {
-  ballSpeed = 500; // Normal mode
-  startGame();
-});
-
-fastModeButton.addEventListener("click", () => {
-  ballSpeed = 250; // Fast mode
-  startGame();
-});
-
-// Start the game in normal mode by default
-startGame();
+// Game loop
+setInterval(drawGame, 100);
