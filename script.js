@@ -5,6 +5,7 @@ const restartButton = document.getElementById('restartButton');
 const gameOverScreen = document.getElementById('gameOverScreen');
 const finalScoreDisplay = document.getElementById('finalScore');
 const playAgainButton = document.getElementById('playAgainButton');
+const particleContainer = document.getElementById('particleContainer');
 
 const gridSize = 20; // Size of each grid square
 const tileCount = canvas.width / gridSize; // Number of tiles in each row/column
@@ -14,10 +15,43 @@ let food = { x: 5, y: 5 }; // Initial food position
 let direction = { x: 0, y: 0 }; // Initial direction
 let score = 0;
 let gameOver = false;
+let lastUpdateTime = 0;
+const snakeSpeed = 10; // Pixels per second
+
+// Particle class for effects
+class Particle {
+    constructor(x, y, color) {
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        this.size = Math.random() * 5 + 2;
+        this.speedX = Math.random() * 4 - 2;
+        this.speedY = Math.random() * 4 - 2;
+        this.life = 30;
+    }
+
+    update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        this.life--;
+    }
+
+    draw() {
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+    }
+}
+
+let particles = [];
 
 // Draw the game
-function drawGame() {
+function drawGame(currentTime) {
     if (gameOver) return;
+
+    const deltaTime = (currentTime - lastUpdateTime) / 1000;
+    lastUpdateTime = currentTime;
 
     // Clear the canvas
     ctx.fillStyle = '#222';
@@ -43,14 +77,15 @@ function drawGame() {
     ctx.fill();
 
     // Move the snake
-    const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
+    const head = { x: snake[0].x + direction.x * deltaTime * snakeSpeed, y: snake[0].y + direction.y * deltaTime * snakeSpeed };
     snake.unshift(head);
 
     // Check for food collision
-    if (head.x === food.x && head.y === food.y) {
+    if (Math.abs(head.x - food.x) < 0.5 && Math.abs(head.y - food.y) < 0.5) {
         score++;
         scoreDisplay.textContent = score;
         placeFood();
+        createParticles(food.x * gridSize + gridSize / 2, food.y * gridSize + gridSize / 2, 'red');
     } else {
         snake.pop(); // Remove the tail if no food is eaten
     }
@@ -59,11 +94,29 @@ function drawGame() {
     if (
         head.x < 0 || head.x >= tileCount ||
         head.y < 0 || head.y >= tileCount ||
-        snake.slice(1).some(segment => segment.x === head.x && segment.y === head.y)
+        snake.slice(1).some(segment => Math.abs(segment.x - head.x) < 0.5 && Math.abs(segment.y - head.y) < 0.5)
     ) {
         gameOver = true;
         finalScoreDisplay.textContent = score;
         gameOverScreen.classList.remove('hidden');
+    }
+
+    // Draw particles
+    particles.forEach((particle, index) => {
+        particle.update();
+        particle.draw();
+        if (particle.life <= 0) {
+            particles.splice(index, 1);
+        }
+    });
+
+    requestAnimationFrame(drawGame);
+}
+
+// Create particles for effects
+function createParticles(x, y, color) {
+    for (let i = 0; i < 20; i++) {
+        particles.push(new Particle(x, y, color));
     }
 }
 
@@ -73,7 +126,7 @@ function placeFood() {
     food.y = Math.floor(Math.random() * tileCount);
 
     // Ensure food doesn't spawn on the snake
-    if (snake.some(segment => segment.x === food.x && segment.y === food.y)) {
+    if (snake.some(segment => Math.abs(segment.x - food.x) < 0.5 && Math.abs(segment.y - food.y) < 0.5)) {
         placeFood();
     }
 }
@@ -113,5 +166,5 @@ restartButton.addEventListener('click', resetGame);
 // Play again button
 playAgainButton.addEventListener('click', resetGame);
 
-// Game loop
-setInterval(drawGame, 100);
+// Start the game loop
+requestAnimationFrame(drawGame);
