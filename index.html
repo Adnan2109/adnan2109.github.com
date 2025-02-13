@@ -1,25 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Click the Ball Game</title>
-  <link rel="stylesheet" href="style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Game</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="game-container glass">
-    <h1>Click the Ball!</h1>
-    <p>Score: <span id="score">0</span></p>
-    <p>Time Left: <span id="time-left">10</span>s</p>
-    <p>High Score: <span id="high-score">0</span></p>
-    <div id="ball"></div>
-    <div class="modes">
-      <button id="slow-mode" class="mode-button">Slow</button>
-      <button id="normal-mode" class="mode-button">Normal</button>
-      <button id="fast-mode" class="mode-button">Fast</button>
+    <div class="game-container">
+        <h1>Snake Game</h1>
+        <canvas id="gameCanvas" width="400" height="400"></canvas>
+        <p>Use arrow keys to control the snake. Eat the food to grow!</p>
+        <p>Score: <span id="score">0</span></p>
     </div>
-  </div>
-  <script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
