@@ -15,6 +15,8 @@
         </div>
         <p>Use arrow keys to control the snake. Eat the food to grow!</p>
         <p>Score: <span id="score">0</span></p>
+        <p>Level: <span id="level">1</span></p>
+        <p>High Score: <span id="highScore">0</span></p>
         <button id="restartButton">Restart</button>
         <div id="gameOverScreen" class="hidden">
             <h2>Game Over!</h2>
@@ -22,6 +24,8 @@
             <button id="playAgainButton">Play Again</button>
         </div>
     </div>
+    <audio id="eatSound" src="eat.mp3"></audio>
+    <audio id="gameOverSound" src="gameover.mp3"></audio>
     <script src="script.js"></script>
 </body>
 </html>
