@@ -5,94 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pac-Man</title>
     <link rel="stylesheet" href="style.css">
-    <style>
-        body {
-            text-align: center;
-            background-color: black;
-            color: yellow;
-            font-family: Arial, sans-serif;
-            overflow: hidden; /* Prevent scrollbars if canvas is larger than viewport */
-        }
-        canvas {
-            background-color: black;
-            display: block;
-            margin: auto;
-        }
-    </style>
 </head>
 <body>
     <h1>Pac-Man</h1>
     <canvas id="gameCanvas" width="400" height="400"></canvas>
-    <script>
-        const canvas = document.getElementById("gameCanvas");
-        const ctx = canvas.getContext("2d");
-
-        let pacman = { x: 200, y: 200, size: 20, speed: 5, direction: 'right' };
-
-        function drawPacman() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.beginPath();
-
-            // Mouth opening and closing animation
-            const mouthOpen = Math.sin(Date.now() * 0.005) * 0.4 + 0.8; // Adjust speed and range
-            ctx.arc(pacman.x, pacman.y, pacman.size, 0.2 * Math.PI * mouthOpen, 1.8 * Math.PI * mouthOpen, false);
-            ctx.lineTo(pacman.x, pacman.y);
-
-            ctx.fillStyle = "yellow";
-            ctx.fill();
-            ctx.closePath();
-        }
-
-        function movePacman() {
-            const nextX = pacman.x + (pacman.direction === 'right' ? pacman.speed : pacman.direction === 'left' ? -pacman.speed : 0);
-            const nextY = pacman.y + (pacman.direction === 'down' ? pacman.speed : pacman.direction === 'up' ? -pacman.speed : 0);
-
-
-            // Boundary detection with "wrapping" – Pac-Man appears on the opposite side
-            if (nextX + pacman.size > canvas.width) {
-                pacman.x = -pacman.size; // Wrap to the left
-            } else if (nextX - pacman.size < 0) {
-                pacman.x = canvas.width + pacman.size;  // Wrap to the right
-            } else {
-                pacman.x = nextX;
-            }
-
-            if (nextY + pacman.size > canvas.height) {
-                pacman.y = -pacman.size; // Wrap to the top
-            } else if (nextY - pacman.size < 0) {
-                pacman.y = canvas.height + pacman.size; // Wrap to the bottom
-            } else {
-                pacman.y = nextY;
-            }
-
-
-        }
-
-        function update() {
-            movePacman();
-            drawPacman();
-            requestAnimationFrame(update);
-        }
-
-        document.addEventListener("keydown", (event) => {
-            // Use switch statement for cleaner code
-            switch (event.key) {
-                case "ArrowRight":
-                    pacman.direction = 'right';
-                    break;
-                case "ArrowLeft":
-                    pacman.direction = 'left';
-                    break;
-                case "ArrowUp":
-                    pacman.direction = 'up';
-                    break;
-                case "ArrowDown":
-                    pacman.direction = 'down';
-                    break;
-            }
-        });
-
-        update();
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
