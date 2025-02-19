@@ -3,29 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game</title>
+    <title>Pac-Man</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="game-container">
-        <h1>Snake Game</h1>
-        <div class="canvas-container">
-            <canvas id="gameCanvas" width="600" height="600"></canvas>
-            <div id="particleContainer"></div>
-        </div>
-        <p>Use arrow keys to control the snake. Eat the food to grow!</p>
-        <p>Score: <span id="score">0</span></p>
-        <p>Level: <span id="level">1</span></p>
-        <p>High Score: <span id="highScore">0</span></p>
-        <button id="restartButton">Restart</button>
-        <div id="gameOverScreen" class="hidden">
-            <h2>Game Over!</h2>
-            <p>Your score: <span id="finalScore">0</span></p>
-            <button id="playAgainButton">Play Again</button>
-        </div>
-    </div>
-    <audio id="eatSound" src="eat.mp3"></audio>
-    <audio id="gameOverSound" src="gameover.mp3"></audio>
+    <h1>Pac-Man</h1>
+    <canvas id="gameCanvas" width="400" height="400"></canvas>
     <script src="script.js"></script>
 </body>
 </html>
