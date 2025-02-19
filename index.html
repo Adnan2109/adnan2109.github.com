@@ -26,6 +26,11 @@
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
         
+        if (!ctx) {
+            console.error("Failed to get canvas context");
+            throw new Error("Canvas context is not supported.");
+        }
+        
         let pacman = { x: 200, y: 200, size: 20, speed: 5, direction: 'right' };
         
         function drawPacman() {
@@ -39,10 +44,20 @@
         }
         
         function movePacman() {
-            if (pacman.direction === 'right') pacman.x = Math.min(pacman.x + pacman.speed, canvas.width - pacman.size);
-            if (pacman.direction === 'left') pacman.x = Math.max(pacman.x - pacman.speed, pacman.size);
-            if (pacman.direction === 'up') pacman.y = Math.max(pacman.y - pacman.speed, pacman.size);
-            if (pacman.direction === 'down') pacman.y = Math.min(pacman.y + pacman.speed, canvas.height - pacman.size);
+            switch (pacman.direction) {
+                case 'right':
+                    pacman.x = Math.min(pacman.x + pacman.speed, canvas.width - pacman.size);
+                    break;
+                case 'left':
+                    pacman.x = Math.max(pacman.x - pacman.speed, pacman.size);
+                    break;
+                case 'up':
+                    pacman.y = Math.max(pacman.y - pacman.speed, pacman.size);
+                    break;
+                case 'down':
+                    pacman.y = Math.min(pacman.y + pacman.speed, canvas.height - pacman.size);
+                    break;
+            }
         }
         
         function update() {
@@ -52,15 +67,20 @@
         }
         
         document.addEventListener("keydown", (event) => {
-            if (event.key === "ArrowRight") pacman.direction = 'right';
-            else if (event.key === "ArrowLeft") pacman.direction = 'left';
-            else if (event.key === "ArrowUp") pacman.direction = 'up';
-            else if (event.key === "ArrowDown") pacman.direction = 'down';
+            const directions = {
+                ArrowRight: 'right',
+                ArrowLeft: 'left',
+                ArrowUp: 'up',
+                ArrowDown: 'down'
+            };
+            if (event.key in directions) {
+                pacman.direction = directions[event.key];
+            }
         });
         
         update();
     </script>
-   <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-<script>eruda.init();</script>    
+    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+<script>eruda.init();</script>
 </body>
 </html>
