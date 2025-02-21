@@ -1,9 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Echo of Shadows</title>
+    <title>Light & Shadows</title>
     <style>
         body {
             margin: 0;
@@ -13,7 +12,6 @@
         }
         canvas {
             display: block;
-            margin: auto;
             background-color: black;
         }
     </style>
@@ -22,119 +20,64 @@
     <canvas id="gameCanvas"></canvas>
     <script>
         const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext('2d');function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
 
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
+    let playerX = canvas.width / 2;
+    let playerY = canvas.height / 2;
+    let playerSpeed = 5;
+    let lightRadius = 200;
+    let lightOn = true;
 
-        // Player setup
-        const playerRadius = 20;
-        let playerX = canvas.width / 2;
-        let playerY = canvas.height / 2;
-        let playerSpeed = 5;
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowRight') playerX += playerSpeed;
+        if (e.key === 'ArrowLeft') playerX -= playerSpeed;
+        if (e.key === 'ArrowUp') playerY -= playerSpeed;
+        if (e.key === 'ArrowDown') playerY += playerSpeed;
+        if (e.key === ' ') lightOn = !lightOn;
+    });
 
-        // Light setup
-        let lightOn = true;
-        let lightRadius = 250;
+    function drawPlayer() {
+        ctx.beginPath();
+        ctx.arc(playerX, playerY, 15, 0, Math.PI * 2);
+        ctx.fillStyle = "#00f";
+        ctx.fill();
+        ctx.closePath();
+    }
 
-        // Controls
-        let rightPressed = false;
-        let leftPressed = false;
-        let upPressed = false;
-        let downPressed = false;
+    function drawLight() {
+        if (lightOn) {
+            let gradient = ctx.createRadialGradient(playerX, playerY, 50, playerX, playerY, lightRadius);
+            gradient.addColorStop(0, "rgba(255, 255, 255, 0.9)");
+            gradient.addColorStop(0.4, "rgba(100, 100, 100, 0.4)");
+            gradient.addColorStop(0.8, "rgba(20, 20, 20, 0.2)");
+            gradient.addColorStop(1, "rgba(0, 0, 0, 0.9)");
 
-        document.addEventListener('keydown', keyDownHandler, false);
-        document.addEventListener('keyup', keyUpHandler, false);
-
-        function keyDownHandler(e) {
-            if (e.key === "Right" || e.key === "ArrowRight") {
-                rightPressed = true;
-            } else if (e.key === "Left" || e.key === "ArrowLeft") {
-                leftPressed = true;
-            } else if (e.key === "Up" || e.key === "ArrowUp") {
-                upPressed = true;
-            } else if (e.key === "Down" || e.key === "ArrowDown") {
-                downPressed = true;
-            } else if (e.key === " " || e.key === "Spacebar") {
-                lightOn = !lightOn; // Toggle light on/off
-            }
-        }
-
-        function keyUpHandler(e) {
-            if (e.key === "Right" || e.key === "ArrowRight") {
-                rightPressed = false;
-            } else if (e.key === "Left" || e.key === "ArrowLeft") {
-                leftPressed = false;
-            } else if (e.key === "Up" || e.key === "ArrowUp") {
-                upPressed = false;
-            } else if (e.key === "Down" || e.key === "ArrowDown") {
-                downPressed = false;
-            }
-        }
-
-        function drawPlayer() {
+            ctx.fillStyle = "black";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.globalCompositeOperation = "destination-out";
             ctx.beginPath();
-            ctx.arc(playerX, playerY, playerRadius, 0, Math.PI * 2);
-            ctx.fillStyle = "#00f"; // Blue color
+            ctx.arc(playerX, playerY, lightRadius, 0, Math.PI * 2);
+            ctx.fillStyle = gradient;
             ctx.fill();
-            ctx.closePath();
+            ctx.globalCompositeOperation = "source-over";
         }
+    }
 
-        function drawLight() {
-            if (lightOn) {
-                // Create a large, soft, offset glow instead of a perfect circle
-                let gradient = ctx.createRadialGradient(playerX, playerY, 40, playerX, playerY, lightRadius);
-                gradient.addColorStop(0, "rgba(255, 255, 255, 0.7)");  // Slightly dimmer center
-                gradient.addColorStop(0.3, "rgba(255, 255, 255, 0.5)"); // Soft fade
-                gradient.addColorStop(0.7, "rgba(100, 100, 100, 0.2)"); // Less intense edges
-                gradient.addColorStop(1, "rgba(0, 0, 0, 0)");          // Smooth fade into darkness
+    function gameLoop() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawLight();
+        drawPlayer();
+        requestAnimationFrame(gameLoop);
+    }
 
-                ctx.beginPath();
-                ctx.ellipse(playerX, playerY + 30, lightRadius * 1.1, lightRadius * 0.8, 0, 0, Math.PI * 2); // Oval glow
-                ctx.fillStyle = gradient;
-                ctx.fill();
-                ctx.closePath();
-            }
-        }
+    gameLoop();
+</script>
 
-        function drawShadows() {
-            if (!lightOn) {
-                ctx.fillStyle = "rgba(0, 0, 0, 1)";
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-            }
-        }
-
-        function movePlayer() {
-            if (rightPressed && playerX < canvas.width - playerRadius) {
-                playerX += playerSpeed;
-            }
-            if (leftPressed && playerX > playerRadius) {
-                playerX -= playerSpeed;
-            }
-            if (upPressed && playerY > playerRadius) {
-                playerY -= playerSpeed;
-            }
-            if (downPressed && playerY < canvas.height - playerRadius) {
-                playerY += playerSpeed;
-            }
-        }
-
-        function gameLoop() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            drawShadows();    // Draw darkness first
-            drawLight();      // Draw new light effect
-            drawPlayer();     // Draw the player on top
-
-            movePlayer();     // Move the player
-
-            requestAnimationFrame(gameLoop);
-        }
-
-        gameLoop();
-    </script>
 </body>
 </html>
