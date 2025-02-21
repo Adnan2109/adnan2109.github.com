@@ -27,6 +27,7 @@
 
         // Game state
         let gameOver = false;
+        let level = 1;
 
         // Adjust canvas size for mobile devices
         function resizeCanvas() {
@@ -44,8 +45,7 @@
         let playerSpeed = 5;
 
         // Bullet setup
-        const bulletWidth = 5;
-        const bulletHeight = 10;
+        const bulletSize = 10;
         let bullets = [];
 
         // Enemy setup
@@ -122,14 +122,16 @@
             ctx.fill();
         }
 
-        // Draw the bullets (small rectangles)
+        // Draw the bullets (small triangles)
         function drawBullets() {
             bullets.forEach(bullet => {
                 ctx.beginPath();
-                ctx.rect(bullet.x, bullet.y, bulletWidth, bulletHeight);
+                ctx.moveTo(bullet.x + bulletSize / 2, bullet.y); // tip of the bullet
+                ctx.lineTo(bullet.x, bullet.y + bulletSize); // bottom left
+                ctx.lineTo(bullet.x + bulletSize, bullet.y + bulletSize); // bottom right
+                ctx.closePath();
                 ctx.fillStyle = "#ff0000"; // red
                 ctx.fill();
-                ctx.closePath();
             });
         }
 
@@ -184,9 +186,9 @@
                 for (let j = 0; j < enemies.length; j++) {
                     if (
                         bullets[i].x < enemies[j].x + enemyWidth &&
-                        bullets[i].x + bulletWidth > enemies[j].x &&
+                        bullets[i].x + bulletSize > enemies[j].x &&
                         bullets[i].y < enemies[j].y + enemyHeight &&
-                        bullets[i].y + bulletHeight > enemies[j].y
+                        bullets[i].y + bulletSize > enemies[j].y
                     ) {
                         // Remove enemy and bullet
                         enemies.splice(j, 1);
@@ -209,12 +211,11 @@
 
         // Shoot a bullet
         function shootBullet() {
-            if (spacePressed || touchStartX) { // Allow shooting on space bar or touch
-                bullets.push({
-                    x: playerX + playerWidth / 2 - bulletWidth / 2,
-                    y: playerY,
-                });
-            }
+            // Create a new bullet when tapping or pressing space
+            bullets.push({
+                x: playerX + playerWidth / 2 - bulletSize / 2,
+                y: playerY,
+            });
         }
 
         // Game loop
@@ -239,12 +240,19 @@
             updateEnemies();
             detectCollisions();
 
+            // Level up: increase difficulty after every level
+            if (enemies.length === 0) {
+                level++;
+                spawnEnemies(level);
+            }
+
             requestAnimationFrame(gameLoop);
         }
 
-        // Create enemies at random positions
-        function createEnemies() {
-            for (let i = 0; i < 5; i++) {
+        // Create enemies based on the level
+        function spawnEnemies(level) {
+            enemies = [];
+            for (let i = 0; i < level * 5; i++) { // Increase number of enemies with level
                 enemies.push({
                     x: Math.random() * (canvas.width - enemyWidth),
                     y: Math.random() * 100,
@@ -252,7 +260,7 @@
             }
         }
 
-        createEnemies();
+        spawnEnemies(level);
         gameLoop();
     </script>
 </body>
