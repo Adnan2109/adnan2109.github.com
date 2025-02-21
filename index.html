@@ -39,7 +39,7 @@
 
         // Light setup
         let lightOn = true;
-        let lightRadius = 200;
+        let lightRadius = 250;
 
         // Controls
         let rightPressed = false;
@@ -86,14 +86,15 @@
 
         function drawLight() {
             if (lightOn) {
-                // Create a radial gradient for realistic light fading effect
-                let gradient = ctx.createRadialGradient(playerX, playerY, 20, playerX, playerY, lightRadius);
-                gradient.addColorStop(0, "rgba(255, 255, 255, 0.9)");  // Bright center
-                gradient.addColorStop(0.5, "rgba(255, 255, 255, 0.4)"); // Mid fade
-                gradient.addColorStop(1, "rgba(0, 0, 0, 0)");          // Dark fade out
+                // Create a large, soft, offset glow instead of a perfect circle
+                let gradient = ctx.createRadialGradient(playerX, playerY, 40, playerX, playerY, lightRadius);
+                gradient.addColorStop(0, "rgba(255, 255, 255, 0.7)");  // Slightly dimmer center
+                gradient.addColorStop(0.3, "rgba(255, 255, 255, 0.5)"); // Soft fade
+                gradient.addColorStop(0.7, "rgba(100, 100, 100, 0.2)"); // Less intense edges
+                gradient.addColorStop(1, "rgba(0, 0, 0, 0)");          // Smooth fade into darkness
 
                 ctx.beginPath();
-                ctx.arc(playerX, playerY, lightRadius, 0, Math.PI * 2);
+                ctx.ellipse(playerX, playerY + 30, lightRadius * 1.1, lightRadius * 0.8, 0, 0, Math.PI * 2); // Oval glow
                 ctx.fillStyle = gradient;
                 ctx.fill();
                 ctx.closePath();
