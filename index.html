@@ -3,84 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pac-Man</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Space Fighter Game</title>
     <style>
         body {
-            text-align: center;
-            background-color: black;
-            color: yellow;
-            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: black;
         }
         canvas {
-            background-color: black;
             display: block;
             margin: auto;
+            background: #111;
         }
     </style>
 </head>
 <body>
-    <h1>Pac-Man</h1>
-    <canvas id="gameCanvas" width="400" height="400"></canvas>
-    <script>
-        const canvas = document.getElementById("gameCanvas");
-        const ctx = canvas.getContext("2d");
-        
-        if (!ctx) {
-            console.error("Failed to get canvas context");
-            throw new Error("Canvas context is not supported.");
-        }
-        
-        let pacman = { x: 200, y: 200, size: 20, speed: 5, direction: 'right' };
-        
-        function drawPacman() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.beginPath();
-            ctx.arc(pacman.x, pacman.y, pacman.size, 0.2 * Math.PI, 1.8 * Math.PI, false);
-            ctx.lineTo(pacman.x, pacman.y);
-            ctx.fillStyle = "yellow";
-            ctx.fill();
-            ctx.closePath();
-        }
-        
-        function movePacman() {
-            switch (pacman.direction) {
-                case 'right':
-                    pacman.x = Math.min(pacman.x + pacman.speed, canvas.width - pacman.size);
-                    break;
-                case 'left':
-                    pacman.x = Math.max(pacman.x - pacman.speed, pacman.size);
-                    break;
-                case 'up':
-                    pacman.y = Math.max(pacman.y - pacman.speed, pacman.size);
-                    break;
-                case 'down':
-                    pacman.y = Math.min(pacman.y + pacman.speed, canvas.height - pacman.size);
-                    break;
-            }
-        }
-        
-        function update() {
-            movePacman();
-            drawPacman();
-            requestAnimationFrame(update);
-        }
-        
-        document.addEventListener("keydown", (event) => {
-            const directions = {
-                ArrowRight: 'right',
-                ArrowLeft: 'left',
-                ArrowUp: 'up',
-                ArrowDown: 'down'
-            };
-            if (event.key in directions) {
-                pacman.direction = directions[event.key];
-            }
-        });
-        
-        update();
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-<script>eruda.init();</script>
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+
+    <script src="game.js"></script>
 </body>
 </html>
