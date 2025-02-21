@@ -9,6 +9,7 @@
             margin: 0;
             padding: 0;
             background: black;
+            overflow: hidden;
         }
         canvas {
             display: block;
@@ -18,16 +19,26 @@
     </style>
 </head>
 <body>
-    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    <canvas id="gameCanvas"></canvas>
 
     <script>
-        // Get the canvas and context
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
 
+        // Game state
+        let gameOver = false;
+
+        // Adjust canvas size for mobile devices
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
         // Player ship setup
-        const playerWidth = 50;
-        const playerHeight = 30;
+        const playerWidth = 40;
+        const playerHeight = 20;
         let playerX = canvas.width / 2 - playerWidth / 2;
         let playerY = canvas.height - playerHeight - 10;
         let playerSpeed = 5;
@@ -49,7 +60,11 @@
         let leftPressed = false;
         let spacePressed = false;
 
-        // Handle key events
+        // Mobile touch controls
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        // Handle key events for desktop
         document.addEventListener('keydown', keyDownHandler, false);
         document.addEventListener('keyup', keyUpHandler, false);
 
@@ -73,21 +88,44 @@
             }
         }
 
-        // Draw the player
+        // Handle touch events for mobile controls
+        canvas.addEventListener('touchstart', (e) => {
+            touchStartX = e.touches[0].clientX;
+        });
+
+        canvas.addEventListener('touchmove', (e) => {
+            touchEndX = e.touches[0].clientX;
+            if (touchEndX > touchStartX) {
+                rightPressed = true;
+                leftPressed = false;
+            } else if (touchEndX < touchStartX) {
+                leftPressed = true;
+                rightPressed = false;
+            }
+        });
+
+        canvas.addEventListener('touchend', () => {
+            rightPressed = false;
+            leftPressed = false;
+        });
+
+        // Draw the player spaceship (triangle shape)
         function drawPlayer() {
             ctx.beginPath();
-            ctx.rect(playerX, playerY, playerWidth, playerHeight);
-            ctx.fillStyle = "#00f";
-            ctx.fill();
+            ctx.moveTo(playerX + playerWidth / 2, playerY); // tip of the spaceship
+            ctx.lineTo(playerX, playerY + playerHeight); // bottom left
+            ctx.lineTo(playerX + playerWidth, playerY + playerHeight); // bottom right
             ctx.closePath();
+            ctx.fillStyle = "#00f"; // blue
+            ctx.fill();
         }
 
-        // Draw the bullets
+        // Draw the bullets (small rectangles)
         function drawBullets() {
             bullets.forEach(bullet => {
                 ctx.beginPath();
                 ctx.rect(bullet.x, bullet.y, bulletWidth, bulletHeight);
-                ctx.fillStyle = "#ff0000";
+                ctx.fillStyle = "#ff0000"; // red
                 ctx.fill();
                 ctx.closePath();
             });
@@ -106,14 +144,16 @@
             }
         }
 
-        // Draw the enemies
+        // Draw the enemies (simple triangle shapes)
         function drawEnemies() {
             enemies.forEach(enemy => {
                 ctx.beginPath();
-                ctx.rect(enemy.x, enemy.y, enemyWidth, enemyHeight);
-                ctx.fillStyle = "#ff00ff";
-                ctx.fill();
+                ctx.moveTo(enemy.x + enemyWidth / 2, enemy.y); // tip of the enemy
+                ctx.lineTo(enemy.x, enemy.y + enemyHeight); // bottom left
+                ctx.lineTo(enemy.x + enemyWidth, enemy.y + enemyHeight); // bottom right
                 ctx.closePath();
+                ctx.fillStyle = "#ff00ff"; // purple
+                ctx.fill();
             });
         }
 
@@ -121,6 +161,12 @@
         function updateEnemies() {
             for (let enemy of enemies) {
                 enemy.x += enemySpeed * enemyDirection;
+
+                // Check if enemy has reached the bottom or passed the player
+                if (enemy.y + enemyHeight >= canvas.height) {
+                    gameOver = true; // Game over if an enemy reaches the bottom
+                    return;
+                }
 
                 // Change direction if the enemy hits a wall
                 if (enemy.x <= 0 || enemy.x + enemyWidth >= canvas.width) {
@@ -171,6 +217,14 @@
 
         // Game loop
         function gameLoop() {
+            if (gameOver) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = "#fff";
+                ctx.font = "30px Arial";
+                ctx.fillText("Game Over", canvas.width / 2 - 90, canvas.height / 2);
+                return; // Stop the game loop
+            }
+
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             drawPlayer();
