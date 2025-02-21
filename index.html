@@ -41,8 +41,6 @@
         // Light source setup
         let lightOn = true;
         let lightRadius = 200;
-        let lightX = canvas.width / 2;
-        let lightY = canvas.height / 2;
 
         // Key controls
         let rightPressed = false;
@@ -92,7 +90,7 @@
         function drawLight() {
             if (lightOn) {
                 ctx.beginPath();
-                ctx.arc(lightX, lightY, lightRadius, 0, Math.PI * 2);
+                ctx.arc(playerX, playerY, lightRadius, 0, Math.PI * 2); // Light follows player
                 ctx.fillStyle = "rgba(255, 255, 255, 0.5)"; // Light color
                 ctx.fill();
                 ctx.closePath();
