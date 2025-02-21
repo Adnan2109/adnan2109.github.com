@@ -91,6 +91,8 @@
         // Handle touch events for mobile controls
         canvas.addEventListener('touchstart', (e) => {
             touchStartX = e.touches[0].clientX;
+            // Trigger shoot action when tapping anywhere
+            shootBullet();
         });
 
         canvas.addEventListener('touchmove', (e) => {
@@ -207,7 +209,7 @@
 
         // Shoot a bullet
         function shootBullet() {
-            if (spacePressed) {
+            if (spacePressed || touchStartX) { // Allow shooting on space bar or touch
                 bullets.push({
                     x: playerX + playerWidth / 2 - bulletWidth / 2,
                     y: playerY,
