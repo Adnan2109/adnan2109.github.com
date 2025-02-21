@@ -3,33 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Space Fighter Game</title>
+    <title>Echo of Shadows</title>
     <style>
         body {
             margin: 0;
             padding: 0;
-            background: black;
+            background-color: #111;
             overflow: hidden;
         }
         canvas {
             display: block;
             margin: auto;
-            background: #111;
+            background-color: black;
         }
     </style>
 </head>
 <body>
     <canvas id="gameCanvas"></canvas>
-
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
 
-        // Game state
-        let gameOver = false;
-        let level = 1;
-
-        // Adjust canvas size for mobile devices
+        // Adjust canvas size to fit the window
         function resizeCanvas() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
@@ -37,34 +32,24 @@
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
 
-        // Player ship setup
-        const playerWidth = 40;
-        const playerHeight = 20;
-        let playerX = canvas.width / 2 - playerWidth / 2;
-        let playerY = canvas.height - playerHeight - 10;
+        // Player setup
+        const playerRadius = 20;
+        let playerX = canvas.width / 2;
+        let playerY = canvas.height / 2;
         let playerSpeed = 5;
 
-        // Bullet setup
-        const bulletSize = 10;
-        let bullets = [];
+        // Light source setup
+        let lightOn = true;
+        let lightRadius = 200;
+        let lightX = canvas.width / 2;
+        let lightY = canvas.height / 2;
 
-        // Enemy setup
-        const enemyWidth = 40;
-        const enemyHeight = 30;
-        let enemies = [];
-        let enemySpeed = 2;
-        let enemyDirection = 1; // 1 for moving right, -1 for left
-
-        // Control the game
+        // Key controls
         let rightPressed = false;
         let leftPressed = false;
-        let spacePressed = false;
+        let upPressed = false;
+        let downPressed = false;
 
-        // Mobile touch controls
-        let touchStartX = 0;
-        let touchEndX = 0;
-
-        // Handle key events for desktop
         document.addEventListener('keydown', keyDownHandler, false);
         document.addEventListener('keyup', keyUpHandler, false);
 
@@ -73,8 +58,12 @@
                 rightPressed = true;
             } else if (e.key === "Left" || e.key === "ArrowLeft") {
                 leftPressed = true;
+            } else if (e.key === "Up" || e.key === "ArrowUp") {
+                upPressed = true;
+            } else if (e.key === "Down" || e.key === "ArrowDown") {
+                downPressed = true;
             } else if (e.key === " " || e.key === "Spacebar") {
-                spacePressed = true;
+                lightOn = !lightOn; // Toggle light on/off
             }
         }
 
@@ -83,184 +72,70 @@
                 rightPressed = false;
             } else if (e.key === "Left" || e.key === "ArrowLeft") {
                 leftPressed = false;
-            } else if (e.key === " " || e.key === "Spacebar") {
-                spacePressed = false;
+            } else if (e.key === "Up" || e.key === "ArrowUp") {
+                upPressed = false;
+            } else if (e.key === "Down" || e.key === "ArrowDown") {
+                downPressed = false;
             }
         }
 
-        // Handle touch events for mobile controls
-        canvas.addEventListener('touchstart', (e) => {
-            touchStartX = e.touches[0].clientX;
-            // Trigger shoot action when tapping anywhere
-            shootBullet();
-        });
-
-        canvas.addEventListener('touchmove', (e) => {
-            touchEndX = e.touches[0].clientX;
-            if (touchEndX > touchStartX) {
-                rightPressed = true;
-                leftPressed = false;
-            } else if (touchEndX < touchStartX) {
-                leftPressed = true;
-                rightPressed = false;
-            }
-        });
-
-        canvas.addEventListener('touchend', () => {
-            rightPressed = false;
-            leftPressed = false;
-        });
-
-        // Draw the player spaceship (triangle shape)
+        // Draw the player (simple circle)
         function drawPlayer() {
             ctx.beginPath();
-            ctx.moveTo(playerX + playerWidth / 2, playerY); // tip of the spaceship
-            ctx.lineTo(playerX, playerY + playerHeight); // bottom left
-            ctx.lineTo(playerX + playerWidth, playerY + playerHeight); // bottom right
-            ctx.closePath();
-            ctx.fillStyle = "#00f"; // blue
+            ctx.arc(playerX, playerY, playerRadius, 0, Math.PI * 2);
+            ctx.fillStyle = "#00f"; // Blue color
             ctx.fill();
+            ctx.closePath();
         }
 
-        // Draw the bullets (small triangles)
-        function drawBullets() {
-            bullets.forEach(bullet => {
+        // Draw the light source (circle)
+        function drawLight() {
+            if (lightOn) {
                 ctx.beginPath();
-                ctx.moveTo(bullet.x + bulletSize / 2, bullet.y); // tip of the bullet
-                ctx.lineTo(bullet.x, bullet.y + bulletSize); // bottom left
-                ctx.lineTo(bullet.x + bulletSize, bullet.y + bulletSize); // bottom right
-                ctx.closePath();
-                ctx.fillStyle = "#ff0000"; // red
+                ctx.arc(lightX, lightY, lightRadius, 0, Math.PI * 2);
+                ctx.fillStyle = "rgba(255, 255, 255, 0.5)"; // Light color
                 ctx.fill();
-            });
-        }
-
-        // Update bullet position
-        function updateBullets() {
-            for (let i = 0; i < bullets.length; i++) {
-                bullets[i].y -= 5; // Move bullet upwards
-
-                // Remove bullets that go off screen
-                if (bullets[i].y < 0) {
-                    bullets.splice(i, 1);
-                    i--;
-                }
-            }
-        }
-
-        // Draw the enemies (simple triangle shapes)
-        function drawEnemies() {
-            enemies.forEach(enemy => {
-                ctx.beginPath();
-                ctx.moveTo(enemy.x + enemyWidth / 2, enemy.y); // tip of the enemy
-                ctx.lineTo(enemy.x, enemy.y + enemyHeight); // bottom left
-                ctx.lineTo(enemy.x + enemyWidth, enemy.y + enemyHeight); // bottom right
                 ctx.closePath();
-                ctx.fillStyle = "#ff00ff"; // purple
-                ctx.fill();
-            });
-        }
-
-        // Update enemies position
-        function updateEnemies() {
-            for (let enemy of enemies) {
-                enemy.x += enemySpeed * enemyDirection;
-
-                // Check if enemy has reached the bottom or passed the player
-                if (enemy.y + enemyHeight >= canvas.height) {
-                    gameOver = true; // Game over if an enemy reaches the bottom
-                    return;
-                }
-
-                // Change direction if the enemy hits a wall
-                if (enemy.x <= 0 || enemy.x + enemyWidth >= canvas.width) {
-                    enemyDirection *= -1;
-                    enemies.forEach(e => e.y += 20); // Move enemies down when hitting the wall
-                }
             }
         }
 
-        // Collision detection (bullet hits enemy)
-        function detectCollisions() {
-            for (let i = 0; i < bullets.length; i++) {
-                for (let j = 0; j < enemies.length; j++) {
-                    if (
-                        bullets[i].x < enemies[j].x + enemyWidth &&
-                        bullets[i].x + bulletSize > enemies[j].x &&
-                        bullets[i].y < enemies[j].y + enemyHeight &&
-                        bullets[i].y + bulletSize > enemies[j].y
-                    ) {
-                        // Remove enemy and bullet
-                        enemies.splice(j, 1);
-                        bullets.splice(i, 1);
-                        i--;
-                        break;
-                    }
-                }
+        // Draw the shadow effect (area where light doesn't reach)
+        function drawShadows() {
+            if (!lightOn) {
+                ctx.fillStyle = "rgba(0, 0, 0, 1)";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
             }
         }
 
-        // Control the player movement
+        // Update player position
         function movePlayer() {
-            if (rightPressed && playerX < canvas.width - playerWidth) {
+            if (rightPressed && playerX < canvas.width - playerRadius) {
                 playerX += playerSpeed;
-            } else if (leftPressed && playerX > 0) {
+            }
+            if (leftPressed && playerX > playerRadius) {
                 playerX -= playerSpeed;
             }
-        }
-
-        // Shoot a bullet
-        function shootBullet() {
-            // Create a new bullet when tapping or pressing space
-            bullets.push({
-                x: playerX + playerWidth / 2 - bulletSize / 2,
-                y: playerY,
-            });
+            if (upPressed && playerY > playerRadius) {
+                playerY -= playerSpeed;
+            }
+            if (downPressed && playerY < canvas.height - playerRadius) {
+                playerY += playerSpeed;
+            }
         }
 
         // Game loop
         function gameLoop() {
-            if (gameOver) {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = "#fff";
-                ctx.font = "30px Arial";
-                ctx.fillText("Game Over", canvas.width / 2 - 90, canvas.height / 2);
-                return; // Stop the game loop
-            }
-
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            drawPlayer();
-            drawBullets();
-            drawEnemies();
+            drawShadows();    // Draw shadows first
+            drawLight();      // Draw the light circle if it's turned on
+            drawPlayer();     // Draw the player character
 
-            movePlayer();
-            shootBullet();
-            updateBullets();
-            updateEnemies();
-            detectCollisions();
+            movePlayer();     // Move the player based on input
 
-            // Level up: increase difficulty after every level
-            if (enemies.length === 0) {
-                level++;
-                spawnEnemies(level);
-            }
-
-            requestAnimationFrame(gameLoop);
+            requestAnimationFrame(gameLoop); // Repeat the loop
         }
 
-        // Create enemies based on the level
-        function spawnEnemies(level) {
-            enemies = [];
-            for (let i = 0; i < level * 5; i++) { // Increase number of enemies with level
-                enemies.push({
-                    x: Math.random() * (canvas.width - enemyWidth),
-                    y: Math.random() * 100,
-                });
-            }
-        }
-
-        spawnEnemies(level);
         gameLoop();
     </script>
 </body>
