@@ -24,7 +24,6 @@
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
 
-        // Adjust canvas size to fit the window
         function resizeCanvas() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
@@ -38,11 +37,11 @@
         let playerY = canvas.height / 2;
         let playerSpeed = 5;
 
-        // Light source setup
+        // Light setup
         let lightOn = true;
         let lightRadius = 200;
 
-        // Key controls
+        // Controls
         let rightPressed = false;
         let leftPressed = false;
         let upPressed = false;
@@ -77,7 +76,6 @@
             }
         }
 
-        // Draw the player (simple circle)
         function drawPlayer() {
             ctx.beginPath();
             ctx.arc(playerX, playerY, playerRadius, 0, Math.PI * 2);
@@ -86,18 +84,22 @@
             ctx.closePath();
         }
 
-        // Draw the light source (circle)
         function drawLight() {
             if (lightOn) {
+                // Create a radial gradient for realistic light fading effect
+                let gradient = ctx.createRadialGradient(playerX, playerY, 20, playerX, playerY, lightRadius);
+                gradient.addColorStop(0, "rgba(255, 255, 255, 0.9)");  // Bright center
+                gradient.addColorStop(0.5, "rgba(255, 255, 255, 0.4)"); // Mid fade
+                gradient.addColorStop(1, "rgba(0, 0, 0, 0)");          // Dark fade out
+
                 ctx.beginPath();
-                ctx.arc(playerX, playerY, lightRadius, 0, Math.PI * 2); // Light follows player
-                ctx.fillStyle = "rgba(255, 255, 255, 0.5)"; // Light color
+                ctx.arc(playerX, playerY, lightRadius, 0, Math.PI * 2);
+                ctx.fillStyle = gradient;
                 ctx.fill();
                 ctx.closePath();
             }
         }
 
-        // Draw the shadow effect (area where light doesn't reach)
         function drawShadows() {
             if (!lightOn) {
                 ctx.fillStyle = "rgba(0, 0, 0, 1)";
@@ -105,7 +107,6 @@
             }
         }
 
-        // Update player position
         function movePlayer() {
             if (rightPressed && playerX < canvas.width - playerRadius) {
                 playerX += playerSpeed;
@@ -121,17 +122,15 @@
             }
         }
 
-        // Game loop
         function gameLoop() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawShadows();    // Draw darkness first
+            drawLight();      // Draw new light effect
+            drawPlayer();     // Draw the player on top
 
-            drawShadows();    // Draw shadows first
-            drawLight();      // Draw the light circle if it's turned on
-            drawPlayer();     // Draw the player character
+            movePlayer();     // Move the player
 
-            movePlayer();     // Move the player based on input
-
-            requestAnimationFrame(gameLoop); // Repeat the loop
+            requestAnimationFrame(gameLoop);
         }
 
         gameLoop();
